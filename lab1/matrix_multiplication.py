@@ -40,7 +40,7 @@ def binet(A, B):
 
     for i in range(K - K // 2):
         for j in range(M // 2):
-            C[K // 2 +i][ j] += A21B11[i][j] + A22B21[i][j]
+            C[K // 2 + i][j] += A21B11[i][j] + A22B21[i][j]
 
     for i in range(K - K // 2):
         for j in range(M - M // 2):
@@ -60,3 +60,28 @@ def binet(A, B):
 #      [4, 4]]
 #
 # print(binet(A, B))
+
+
+def strassen(A, B):
+    K, L, M = len(A), len(B), len(B[0])
+    # TODO
+
+
+def print_arr(A):
+    for row in A:
+        print(row)
+
+
+if __name__ == '__main__':
+
+    A = [[1, 1, 1, 1],
+         [2, 2, 2, 2],
+         [3, 3, 3, 3]]
+
+    B = [[1, 1],
+         [2, 2],
+         [3, 3],
+         [4, 4]]
+
+    a = binet(A, B)
+    print_arr(a)
