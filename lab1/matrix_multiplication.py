@@ -1,14 +1,16 @@
 from math import log, ceil
+import random
+import time
 
 def binet(A, B, d=None):
     if d == None:
         K, L, M = len(A), len(B), len(B[0])
     else: K, L, M = d
 
-    if K == 0: return []
-    if L == 0: return [[0 for j in range(M)] for i in range(K)]
-    if M == 0: return [[]]
-    if K == 1 and L == 1 and M == 1: return [[A[0][0] * B[0][0]]]
+    if K == 0: return ([], 0)
+    if L == 0: return ([[0 for j in range(M)] for i in range(K)], 0)
+    if M == 0: return ([[]], 0)
+    if K == 1 and L == 1 and M == 1: return ([[A[0][0] * B[0][0]]], 1)
 
     A11 = [[A[i][j] for j in range(0, L // 2)] for i in range(0, K // 2)]
     A12 = [[A[i][j] for j in range(L // 2, L)] for i in range(0, K // 2)]
@@ -188,6 +190,36 @@ def test():
     c = strassen(A, B)
     assert a == c
 
+def measure():
+    file_strassen = open('strassen.txt', 'w')
+    file_binet = open('binet.txt', 'w')
+
+    random.seed(42)
+    for i in range(2, 10):
+        k = 2**i
+        A = [[random.random() for n in range(k)] for m in range(k)]
+        B = [[random.random() for n in range(k)] for m in range(k)]
+
+        start = time.time()
+        C = strassen(A, B)
+        stop = time.time()
+        file_strassen.write(f'{i} {stop-start}\n')
+        print(f'i: {i}, k: {k}, time: {stop-start}')
+
+        start = time.time()
+        D = binet(A, B)
+        stop = time.time()
+        file_binet.write(f'{i} {stop-start}\n')
+        print(f'i: {i}, k: {k}, time: {stop-start}')
+
+
+    file_strassen.close()
+    file_binet.close()
+
+    
+
 
 if __name__ == '__main__':
     test()
+    measure()
+    
