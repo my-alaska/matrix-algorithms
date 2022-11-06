@@ -1,4 +1,4 @@
-#lab 1 - recursive matrix multiplication
+# lab 1 - recursive matrix multiplication
 
 This directory contains code for the first laboratory exercise
 
