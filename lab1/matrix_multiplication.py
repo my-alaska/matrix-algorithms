@@ -7,10 +7,10 @@ def binet(A, B, d=None):
         K, L, M = len(A), len(B), len(B[0])
     else: K, L, M = d
 
-    if K == 0: return []
-    if L == 0: return [[0 for j in range(M)] for i in range(K)]
-    if M == 0: return [[]]
-    if K == 1 and L == 1 and M == 1: return [[A[0][0] * B[0][0]]]
+    if K == 0: return ([], 0)
+    if L == 0: return ([[0 for j in range(M)] for i in range(K)], 0)
+    if M == 0: return ([[]], 0)
+    if K == 1 and L == 1 and M == 1: return ([[A[0][0] * B[0][0]]], 1)
 
     A11 = [[A[i][j] for j in range(0, L // 2)] for i in range(0, K // 2)]
     A12 = [[A[i][j] for j in range(L // 2, L)] for i in range(0, K // 2)]
