@@ -1,4 +1,6 @@
 from math import log, ceil
+import random
+import time
 
 def binet(A, B, d=None):
     if d == None:
@@ -188,6 +190,36 @@ def test():
     c = strassen(A, B)
     assert a == c
 
+def measure():
+    file_strassen = open('strassen.txt', 'w')
+    file_binet = open('binet.txt', 'w')
+
+    random.seed(42)
+    for i in range(2, 10):
+        k = 2**i
+        A = [[random.random() for n in range(k)] for m in range(k)]
+        B = [[random.random() for n in range(k)] for m in range(k)]
+
+        start = time.time()
+        C = strassen(A, B)
+        stop = time.time()
+        file_strassen.write(f'{i} {stop-start}\n')
+        print(f'i: {i}, k: {k}, time: {stop-start}')
+
+        start = time.time()
+        D = binet(A, B)
+        stop = time.time()
+        file_binet.write(f'{i} {stop-start}\n')
+        print(f'i: {i}, k: {k}, time: {stop-start}')
+
+
+    file_strassen.close()
+    file_binet.close()
+
+    
+
 
 if __name__ == '__main__':
     test()
+    measure()
+    
