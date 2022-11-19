@@ -199,8 +199,8 @@ def test():
 
 
 def measure():
-    # file_strassen = open('strassen.txt', 'w')
-    # file_binet = open('binet.txt', 'w')
+    file_strassen = open('strassen.txt', 'w')
+    file_binet = open('binet.txt', 'w')
 
     random.seed(42)
     for i in range(2, 10):
@@ -211,18 +211,18 @@ def measure():
         start = time.time()
         C = strassen(A, B)
         stop = time.time()
-        # file_strassen.write(f'i: {i} {stop-start}\n')
+        file_strassen.write(f'i: {i} {stop-start}\n')
         print(f'strassen, i: {i}, k: {k}, time: {stop-start}, operations: {0}')
 
         start = time.time()
         D, dc = binet(A, B)
         stop = time.time()
 
-        # file_binet.write(f'i: {i} {stop-start}\n')
+        file_binet.write(f'i: {i} {stop-start}\n')
         print(f'binet, i: {i}, k: {k}, time: {stop-start}, operations: {dc}')
 
-    # file_strassen.close()
-    # file_binet.close()
+    file_strassen.close()
+    file_binet.close()
 
 
 if __name__ == '__main__':
