@@ -68,7 +68,7 @@ def inv(M):
 def lu(M):
     k = len(M) // 2
     if k == 0:
-        return [[1]], [[M[0][0]]], 1
+        return [[1]], M, 0
 
     # splitting the input into A11, A12, A21, A22
     A11 = [[M[i][j] for j in range(k)] for i in range(k)]
@@ -85,7 +85,7 @@ def lu(M):
     invU11,i = inv(U11)
     p += i
 
-    # calc
+    # calculating U12 and L21
     U12, i = strassen(invL11,A12)
     p+=i
     L21, i = strassen(A21,invU11)
@@ -121,11 +121,11 @@ def det(M):
     L, U, p = lu(M)
 
     # initializing and computing the result
-    result = L[0]*M[0]
+    result = U[0]
     for i in range(1,len(M)):
-        result *= L[i]*U[i]
+        result *= U[i]
 
-    return result, p + 2*len(M) - 1
+    return result, p + len(M) - 1
 
 
 
@@ -135,13 +135,10 @@ def det(M):
 
 
 
-# matrix = [[1,-2,-2,-3],
-#           [3,-9,0,-9],
-#           [-1,2,4,7],
-#           [-3,-6,26,2]]
-# L, U, p = lu(matrix)
-# for i in range(len(L)):
-#     print(L[i], "    ", U[i])
-
-
-
+matrix = [[1,-2,-2,-3],
+          [3,-9,0,-9],
+          [-1,2,4,7],
+          [-3,-6,26,2]]
+L, U, p = lu(matrix)
+for i in range(len(L)):
+    print(L[i], "    ", U[i])
