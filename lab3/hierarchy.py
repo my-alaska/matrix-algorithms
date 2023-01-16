@@ -37,7 +37,7 @@ class MNode:
                        self.data[1][1].get_size())*2
 
 
-def compress(M, r=2, e=1e-5):
+def compress(M: np.ndarray, r=2, e=1e-5) -> MNode:
 
     # d (size of the d x d input matrix)
     d = len(M)
@@ -78,7 +78,7 @@ def compress(M, r=2, e=1e-5):
     return rek((0, d, 0, d))
 
 
-def decompress(mnode):
+def decompress(mnode) -> np.ndarray:
     # we get the size of compressed matrix
     d = mnode.get_size()
 
@@ -104,8 +104,10 @@ def decompress(mnode):
     rek(mnode)
     return result
 
-m = generate_matrix(2**7, 2**7, 0.2)
-mc = compress(m,3)
-m1 = decompress(mc)
+if __name__ == '__main__':
 
-print(((m-m1)**2).sum())
+    m = generate_matrix(2**7, 2**7, 0.2)
+    mc = compress(m,3)
+    m1 = decompress(mc)
+
+    print(((m-m1)**2).sum())
