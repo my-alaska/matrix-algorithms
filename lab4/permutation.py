@@ -58,9 +58,11 @@ def report():
             compressed2 = compress(permuted)
             size1 = total_size(compressed1)
             size2 = total_size(compressed2)
+            size3 = total_size(matrix)
+            size4 = total_size(permuted)
 
             stop = time.time()
-            result = f"{i} {size1} {size2} {stop - start}"
+            result = f"{i} {size1} {size2} {size3} {size4} {stop - start}"
             print(result)
             compression_results.append(result)
 
@@ -113,6 +115,9 @@ def generate_plots():
     ax.set_xlabel("d")
     ax.set_ylabel("zajęta pamięć [B]")
     fig.savefig("lab4/compression3.png")
+
+
+
 
 
 if __name__ == "__main__":

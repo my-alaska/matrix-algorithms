@@ -34,11 +34,8 @@ class MatrixNode:
                        self.data[0][1].get_size(),
                        self.data[1][1].get_size()) * 2
 
-    def get_size_bytes(self):
-        if self.is_leaf:
-            return getsizeof(self.data[0]) + getsizeof(self.data[1])
-        else:
-            return sum([child.get_size_bytes() for child in self.data[0] + self.data[1]])
+    
+    
 
 
 def compress(matrix: np.ndarray, leaf_order=2, error=1e-5) -> MatrixNode:
