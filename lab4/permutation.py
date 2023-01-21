@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from hierarchy import generate_matrix, compress
+from hierarchical_compression import generate_matrix, compress, Node
+# from hierarchy import generate_matrix, compress
 from total_size import total_size
 import time
 
@@ -52,10 +53,16 @@ def report():
     for i in range(4, 10):
         for _ in range(10):
             start = time.time()
-            matrix = generate_matrix(2**i, 0.1)
+            matrix = generate_matrix(2**i, 0.01)+np.eye(2**i)
             permuted = minimum_degree_transformation(matrix)
-            compressed1 = compress(matrix)
-            compressed2 = compress(permuted)
+            k=2
+            compressed1 = compress(matrix, k=k)
+            compressed2 = compress(permuted, k=k)
+            
+            a = Node.sparsity_representation(compressed2)
+            plt.imshow(a, cmap="gray_r")
+            plt.show()
+
             size1 = total_size(compressed1)
             size2 = total_size(compressed2)
             size3 = total_size(matrix)
@@ -123,5 +130,5 @@ def generate_plots():
 if __name__ == "__main__":
     # np.set_printoptions(linewidth=200, precision=4, floatmode='fixed')
 
-    # report()
-    generate_plots()
+    report()
+    # generate_plots()

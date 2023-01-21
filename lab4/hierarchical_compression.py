@@ -13,7 +13,39 @@ def generate_matrix(size, fill):
 
 
 class Node:
-    pass
+    def sparsity_representation(node) -> np.ndarray:
+        if isinstance(node, ZeroCompressedLeafNode):
+            # return np.zeros(node.shape)
+            matrix = np.zeros(node.shape)
+            k = 1
+            matrix[:k, :] = 1
+            matrix[:, :k] = 1
+            return matrix
+        if isinstance(node, NonCompressedLeafNode):
+            return np.ones(node.matrix.shape)
+        elif isinstance(node, CompressedLeafNode):
+            k = node.v.shape[0]
+            matrix = np.zeros(node.shape)
+            matrix[:k, :] = 1
+            matrix[:, :k] = 1
+            return matrix
+        elif isinstance(node, CompressedInternalNode):
+            a = Node.sparsity_representation(node.a)
+            b = Node.sparsity_representation(node.b)
+            c = Node.sparsity_representation(node.c)
+            d = Node.sparsity_representation(node.d)
+            return np.vstack((np.hstack((a, b)), np.hstack((c, d))))
+
+
+class ZeroCompressedLeafNode(Node):
+    def __init__(self, shape):
+        self.shape = shape
+
+    def print(self, indent=0):
+        print(f"{'  ' * indent}Zero leaf node of shape {self.shape}")
+
+    def __sizeof__(self):
+        return 0
 
 
 class NonCompressedLeafNode(Node):
@@ -21,7 +53,7 @@ class NonCompressedLeafNode(Node):
         self.matrix = matrix
         self.shape = matrix.shape
 
-    def print(self, indent):
+    def print(self, indent=0):
         print(f"{'  ' * indent}Leaf node of size {self.matrix.shape}")
         for row in self.matrix:
             print(f"{'  ' * (indent + 1)}{row}")
@@ -36,7 +68,7 @@ class CompressedLeafNode(Node):
         self.v = v
         self.shape = u.shape[0], v.shape[1]
 
-    def print(self, indent):
+    def print(self, indent=0):
         print(f"{'  ' * indent}Compressed leaf node")
         print(f"{'  ' * (indent + 1)}U:")
         for row in self.u:
@@ -57,7 +89,7 @@ class CompressedInternalNode(Node):
         self.d = d
         self.shape = shape
 
-    def print(self, indent):
+    def print(self, indent=0):
         print(f"{'  ' * indent}Internal node")
         self.a.print(indent + 1)
         self.b.print(indent + 1)
@@ -87,11 +119,20 @@ def compress(
         return NonCompressedLeafNode(matrix.copy())
 
     u, s, v = randomized_svd(matrix, n_components=k + 1, n_iter=5, random_state=42)
-    u = u[:, :-1]
-    s = s[:-1]
-    v = v[:-1, :]
+
     if s[-1] < epsilon:
-        return CompressedLeafNode(u, np.diag(s) @ v)
+        if s[0] < epsilon:
+            return ZeroCompressedLeafNode(matrix.shape)
+        else:
+            while(s[-1] < epsilon):
+                u = u[:, :-1]
+                s = s[:-1]
+                v = v[:-1, :]
+            
+            # u = u[:, :-1]
+            # s = s[:-1]
+            # v = v[:-1, :]
+            return CompressedLeafNode(u, np.diag(s) @ v)
     else:
         a = compress(matrix[0 : d // 2, 0 : d // 2], k, epsilon, depth=depth + 1)
         b = compress(matrix[0 : d // 2, d // 2 : d], k, epsilon, depth=depth + 1)
@@ -101,7 +142,9 @@ def compress(
 
 
 def decompress(node: Node, matrix: np.ndarray, coords: Tuple[int, int]) -> np.ndarray:
-    if isinstance(node, NonCompressedLeafNode):
+    if isinstance(node, ZeroCompressedLeafNode):
+        pass
+    elif isinstance(node, NonCompressedLeafNode):
         matrix[
             coords[0] : coords[0] + node.matrix.shape[0],
             coords[1] : coords[1] + node.matrix.shape[1],
@@ -123,41 +166,21 @@ def decompress(node: Node, matrix: np.ndarray, coords: Tuple[int, int]) -> np.nd
             (coords[0] + node.d.shape[0] // 2, coords[1] + node.d.shape[1] // 2),
         )
 
-# write function node_representation that takes as input Node and returns a matrix that represents the node
-# if the node is a compressed leaf node, write the matrix as matrix full of zeros, but first k rows and columns are filled with ones.
-# k is the length of vector v in the compressed leaf node 
-# do the same if the node is a compressed zero node. If node is a non compressed leaf node, write the matrix as it is.
-# if node is an internal node, write the matrix as stack of matrices of its children
 
-def sparsity_representation(node: Node) -> np.ndarray:
-    if isinstance(node, NonCompressedLeafNode):
-        return np.ones(node.matrix.shape)
-    elif isinstance(node, CompressedLeafNode):
-        k = node.v.shape[0]
-        matrix = np.zeros(node.shape)
-        matrix[:k, :] = 1
-        matrix[:, :k] = 1
-        return matrix
-    elif isinstance(node, CompressedInternalNode):
-        a = sparsity_representation(node.a)
-        b = sparsity_representation(node.b)
-        c = sparsity_representation(node.c)
-        d = sparsity_representation(node.d)
-        return np.vstack((np.hstack((a, b)), np.hstack((c, d))))
+if __name__ == "__main__":
+    print("Here")
+    print()
+    A = generate_matrix(128, 0.01)
+    A = np.eye(512)
+    print(A)
+    print("Here 2")
 
+    B = compress(A, k=5)
+    B.print(0)
 
+    print("Here 3")
+    C = decompress(B, np.zeros(A.shape), (0, 0))
 
-print("Here")
-print()
-A = generate_matrix(32, 0.1)
-print(A)
-print("Here 2")
-B = compress(A, k=5)
-B.print(0)
-
-print("Here 3")
-C = decompress(B, np.zeros(A.shape), (0, 0))
-
-print(sparsity_representation(B))
-plt.imshow(sparsity_representation(B), cmap="gray_r")
-plt.show()
+    print(Node.sparsity_representation(B))
+    plt.imshow(Node.sparsity_representation(B), cmap="gray_r")
+    plt.show()
